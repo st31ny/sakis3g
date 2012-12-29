@@ -13,7 +13,7 @@
 	dh $@ 
 
 override_dh_auto_build:
-	if [ ! -f "build" ]; then
+	if [ ! -d "build" ]; then
 		mkdir build
 	fi
 	./compile
