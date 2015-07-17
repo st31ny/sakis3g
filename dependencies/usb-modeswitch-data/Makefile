@@ -1,31 +1,45 @@
 PROG        = usb-modeswitch-data
-VERS        = 20100623
+VERS        = 20131113
 RM          = /bin/rm -f
 PREFIX      = $(DESTDIR)/usr
 ETCDIR      = $(DESTDIR)/etc
-UDEVDIR     = $(DESTDIR)/lib/udev
-RULESDIR    = $(UDEVDIR)/rules.d
-SBINDIR     = $(PREFIX)/sbin
-MANDIR      = $(PREFIX)/share/man/man1
+RULESDIR    = $(DESTDIR)/lib/udev/rules.d
 
 
 .PHONY:     clean
 
-all:
+all: 40-usb_modeswitch.rules
 
 clean:
+	$(RM) 40-usb_modeswitch.rules
 
-install: files-install rules-reload
+install: all files-install db-install rules-reload
 
-files-install:
+install-packed: files-install db-install-packed rules-reload
+
+files-install: 
+	install -d $(PREFIX)/share/usb_modeswitch
 	install -d $(ETCDIR)/usb_modeswitch.d
-	install --mode=644 -t $(ETCDIR)/usb_modeswitch.d ./usb_modeswitch.d/*
 	install -D --mode=644 40-usb_modeswitch.rules $(RULESDIR)/40-usb_modeswitch.rules
 
+40-usb_modeswitch.rules:
+	./gen-rules.tcl
+
+db-install: files-install
+	install --mode=644 -t $(PREFIX)/share/usb_modeswitch ./usb_modeswitch.d/*
+
+db-install-packed:
+	@# Create a compressed tar without gzip timestamp, so tar.gz
+	@# differs only if content is different
+	cd ./usb_modeswitch.d; tar -cf ../configPack.tar *
+	gzip -f9n ./configPack.tar
+	install --mode=644 -t $(PREFIX)/share/usb_modeswitch ./configPack.tar.gz
+	rm -f ./configPack.tar.gz
+
 rules-reload:
-	if [ -f $(ETCDIR)/issue ]; then \
-		if [ -n `which udevadm 2>/dev/null` ]; then \
-			UDEVADM=`which udevadm`; \
+	@if [ -f $(ETCDIR)/issue ]; then \
+		UDEVADM=`which udevadm 2>/dev/null`; \
+		if [ "x$$UDEVADM" != "x" ]; then \
 			UDEVADM_VER=`$$UDEVADM -V 2>/dev/null`; \
 			if [ -z $$UDEVADM_VER ]; then \
 				UDEVADM_VER=`$$UDEVADM --version 2>/dev/null`; \
@@ -43,10 +57,7 @@ rules-reload:
 uninstall: files-uninstall rules-reload
 
 files-uninstall:
-	$(RM) $(SBINDIR)/usb_modeswitch
-	$(RM) $(UDEVDIR)/usb_modeswitch
 	$(RM) $(RULESDIR)/40-usb_modeswitch.rules
-	$(RM) -R $(ETCDIR)/usb_modeswitch.d
+	$(RM) -R $(PREFIX)/share/usb_modeswitch
 
 .PHONY:    clean install uninstall
-
