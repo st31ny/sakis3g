@@ -1,3 +1,59 @@
+0.2.0e  2014/09/05
+
+    * Embedded Usb-ModeSwitch:
+          o Upgraded to version 2.1.1.
+
+0.2.0e  2014/04/15
+
+    * Fixed the following issues:
+          o Removed experimental YAD interface since it broke Zenity.
+          o The internal (re)compile command has been fixed.
+
+0.2.0e  2014/03/29
+
+    * Embedded Usb-ModeSwitch:
+          o Upgraded to version 2.1.0.
+          o Updated to custom database based on 2013-11-13 release.
+
+0.2.0e	2014/03/28
+
+    * New functionality:
+          o Experimental YAD interface added. 
+    * Fixed the following issues:
+          o Usb_ModeSwitch will now compile on the newer versions of Ubuntu.
+    * Embedded Usb-ModeSwitch:
+          o Upgraded to version 1.2.7.
+          o Reverted to database from 2013-06-10.
+
+0.2.0e  2014/03/24
+
+    * New functionality:
+          o Italian translation is now available for those using a unicode  it_IT.UTF-8 
+            locale. (Thanks mortaromarcello!)
+          o Added an example sakis3g.conf for reference.
+    * Fixed the following issues:
+          o Added the build directory with an .empty file in it to avoid having to
+            take an extra step when compiling.
+    * Operators' database:
+          o Added the following networks:
+                + 52015:QUB (Cambodia).
+          o Updated South African icons for Mobile Networks.
+
+0.2.0e	2013/07/03
+
+    * Modified functionality:
+          o Sakis3g (and compile scripts) now require only bash to be installed
+            to work. Bash does not have to be the default shell.
+    * Fixed the following issues:
+          o Modified Usb-ModeSwitch database to use the old format that they 
+            dropped early in 2012. All devices should work again.
+    * Embedded Usb-ModeSwitch:
+          o Upgraded to version 1.2.6.
+          o Device database upgraded to 2013-06-10 version.
+    * Operators' database:
+          o Added the following networks:
+                + 65502: 8.ta (South Africa).
+
 0.2.0e	2010/07/09
 
     * New functionality:

@@ -1,9 +1,9 @@
 /*
-  This file is part of usb-modeswitch, a mode switching tool for controlling
-  flip flop (multiple device) USB gear
+  This file is part of usb_modeswitch, a mode switching tool for controlling
+  the mode of 'multi-state' USB devices
 
-  Version 1.1.3, 2010/06/21
-  Copyright (C) 2007, 2008, 2009, 2010  Josua Dietze
+  Version 2.2.0, 2014/05/29
+  Copyright (C) 2007 - 2014  Josua Dietze
 
   Config file parsing stuff borrowed from Guillaume Dargaud
   (http://www.gdargaud.net/Hack/SourceCode.html)
@@ -22,9 +22,8 @@
 
 */
 
-
 #include <stdlib.h>
-#include <usb.h>
+#include <libusb.h>
 
 void readConfigFile(const char *configFilename);
 void printConfig();
@@ -32,9 +31,17 @@ int switchSendMessage();
 int switchConfiguration();
 int switchAltSetting();
 void switchHuaweiMode();
+
 void switchSierraMode();
 void switchGCTMode();
-void switchAVMMode();
+void switchKobilMode();
+void switchQisdaMode();
+void switchQuantaMode();
+void switchSequansMode();
+void switchActionMode();
+void switchBlackberryMode();
+void switchPantechMode();
+void switchCiscoMode();
 int switchSonyMode();
 int detachDriver();
 int checkSuccess();
@@ -42,9 +49,11 @@ int sendMessage(char* message, int count);
 int write_bulk(int endpoint, char *message, int length);
 int read_bulk(int endpoint, char *buffer, int length);
 void release_usb_device(int dummy);
-struct usb_device* search_devices( int *numFound, int vendor, int product, char* productList, int targetClass, int mode);
-int find_first_bulk_output_endpoint(struct usb_device *dev);
-int find_first_bulk_input_endpoint(struct usb_device *dev);
+struct libusb_device* search_devices( int *numFound, int vendor, char* productList,
+		int targetClass, int configuration, int mode);
+int find_first_bulk_endpoint(int direction);
+int get_current_configuration();
+int get_interface_class();
 char* ReadParseParam(const char* FileName, char *VariableName);
 int hex2num(char c);
 int hex2byte(const char *hex);
@@ -56,6 +65,8 @@ void deviceDescription();
 int deviceInquire();
 void resetUSB();
 void release_usb_device(int dummy);
+int findMBIMConfig(int vendor, int product, int mode);
+
 
 // Boolean
 #define  and     &&
@@ -98,3 +109,7 @@ extern char *TempPP;
 	if ((TempPP=ReadParseParam((ParamFileName), #B))!=NULL) \
 		B=(toupper(TempPP[0])=='Y' || toupper(TempPP[0])=='T'|| TempPP[0]=='1'); else B=0
 
+#define ParseParamBoolMap(ParamFileName, B, M, Const) \
+	if ((TempPP=ReadParseParam((ParamFileName), #B))!=NULL) \
+		if (toupper(TempPP[0])=='Y' || toupper(TempPP[0])=='T'|| TempPP[0]=='1') \
+			M=M+Const

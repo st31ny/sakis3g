@@ -1,7 +1,147 @@
 
-History of USB-ModeSwitch
+History of USB_ModeSwitch
 =========================
 
+Version 2.2.0, 2014/05/29
+    Introduction of parameter "HuaweiNewMode", wrapping the standard bulk
+    message for all newer Huawei devices; support for generic fall-back
+    config files, combined with OS switch (per vendor ID), implementation
+    to use a specific switching command on Android for all Huawei devices
+    (see README of data package for details); this change was suggested
+    by Huawei
+Version 2.1.1, 2014/03/27
+    Code cleanup, better use of libusb1; this also fixes problems with
+    determination of the active USB configuration (Samsung, Option modems);
+    "Interface" parameter was not working as expected, fixed (see also:
+    https://bugs.launchpad.net/bugs/1261923 ); fixed bogus interface release
+    in "inquire" function, again a report by "Sonya@zte"
+Version 2.1.0, 2014/01/28
+    ATTENTION: -I flag meaning reversed, default is to skip SCSI inquiry;
+    introduction of StandardEject, replacing many MessageContents with the
+    same function, reducing size of device config files, and always including
+    the 'Allow Medium Removal' before ejecting (thanks to Lars Melin for
+    the idea); fix in "bulk_read", removing bogus CSW request (report from
+    "Sonya@zte")
+Version 2.0.1, 2013/09/03
+    Fixed stupid string size bug which could lead to memory corruption
+    (thanks to Leonid Myravjev)
+Version 2.0.0, 2013/09/01
+    Switched to libusb1.0, with much help from folks of the wl500g project
+    (http://wl500g.googlecode.com): Vladislav Grishenko, Leonid Lisovskiy,
+    Roman Samarev, Andrey Tikhomirov;
+    major code and debug output cleanup; man page corrections and additions
+    (thanks to Thomas Haller);
+    experimental systemd and upstart integration, if present
+    (Explanation: newer udev versions kill all subprocesses, detached or
+    not. The suggested way to handle longer running processes like the
+    usb_modeswitch_dispatcher is to add simple services or tasks and start
+    these by sending signals from the udev rule)
+    !! Attention, system integrators: a crude install facility is included
+    in the Makefile to check if "upstart" or "systemd" is active and to
+    install the matching service file; you may want to adapt it better to
+    your respective system, possibly adding dependencies/targets to the
+    services. Note that the udev starter script usb_modeswitch.sh also
+    checks for the existence of the service files
+Version 1.2.7, 2013/08/07
+    Two new dedicated control message functions to support Pantech LTE
+    (thanks to Adam Goode) and Blackberry Q10/Z10 (thanks to Daniel Mende)
+Version 1.2.6, 2013/06/02
+    Several changes to streamline compiling as part of larger projects
+    (thanks to Nicolas Carrier), mostly in Makefile; fix compiler warnings
+    appearing in certain build environments (N. Carrier); new Quanta
+    procedure (thanks to Andrey Tikhomirov) for Quanta 1K3 LTE; fix for
+    error with cascaded hubs in dispatcher script (hint from N. Carrier)
+Version 1.2.5, 2012/11/09
+    Initial support for MBIM devices, use with data package >= 20121109;
+    checking for these is the automatic default, new parameter NoMBIMCheck
+    prevents the check per device in case of problems; new global option
+    to set "delay_use" of usb-storage (as low values may prevent
+    mode-switching); fix for handling multi-configuration devices (thanks
+    to Bjørn Mork for advice)
+Version 1.2.4, 2012/08/12
+    Additional interface checks to prevent sending UFI commands to non-
+    storage interfaces (prompted by more ambiguous device IDs popping up);
+    change in SierraMode for handling newer devices which caused an error
+    abort before; Makefile fix for parallelized make runs
+Version 1.2.3, 2012/01/28
+    Fixed two bugs both causing the embedded-jimsh install variant of the
+    dispatcher crash (the "pure-script" install variant was NOT affected);
+    fixed some "regexp" incompatibilities with Debian's libjim
+Version 1.2.2, 2012/01/19
+    Fixed bad bug preventing mode switch for devices using TargetClass;
+    improved logging in case of negative success check
+Version 1.2.1, 2011/12/26
+    Fixed possible ambiguities when multiple identical modems are plugged
+    synchronously; this is achieved by adding -b and -g parameter (busnum
+    and devnum) for proper id'ing; some resulting workflow changes and
+    shortcuts in "system integration" mode (use sysfs/wrapper for success
+    control, reduce informative checks); improved hub usage robustness;
+    future data packages can be ridded of redundancies (default ID, success
+    check parameters), resulting in smaller files;
+    fixed bad bug which may prevent switching completely when logging is
+    not activated; fixed possible overflow in dispatcher C code (thanks to
+    Gilles Espinasse)
+Version 1.2.0, 2011/10/23
+    Added QisdaMode for Qisda H21 (thanks to Chi-Hang Long for the code);
+    dispatcher can now be installed with an embedded interpreter, so that
+    Tcl is no longer required; added command line options for binary program
+    to accept configuration data via stdin or as a long string parameter -
+    this fixes the bug with non-writable temporary file during boot;
+    reversed skipping of pre-switching delay, which has caused problems;
+    fixed potential buffer overflow (thanks to Rafael Silva for the find);
+    get first interface right even on some broken devices (thanks to
+    Alexander Gordeev for the patch); increased post-switch delay before
+    driver binding to avoid possible conflict with usb-storage
+Version 1.1.9, 2011/08/05
+    Added CiscoMode for Valet device; additional checking for CDC ACM device
+    to prevent erroneous driver loading after switching; no more post-switch
+    check for access to initial device if target parameters are given
+Version 1.1.8, 2011/06/19
+    Cleaned up switchSendMessage(); added workaround for quirky devices not
+    reporting configuration setting; added non-CSW response for arbitrary
+    bulk transfers; added SequansMode and MobileActionMode; check for active
+    configuration will be skipped if bNumConfigurations is 1 (most cases)
+Version 1.1.7, 2011/02/27
+    Attention: paths for runtime files and database have changed! Old places
+    will be found but are deprecated; /usr/share/usb_modeswitch for database,
+    /var/lib/usb_modeswitch for "remembered" IDs;
+    fix for configuration setting race (thanks to Amit Mendapara); discovered
+    incompatibility between Tcl versions <= 8.3 and >=8.4, so 8.4 is the
+    minimum prerequisite now;
+    first availability of an alternative source pack which includes "jimsh",
+    a fast Tcl mini shell, intended for resource-constrained systems
+Version 1.1.6, 2010/12/22
+    Moved warm-boot driver binding to sh wrapper, was unreliable in 1.1.5;
+    sh wrapper overhaul, made compatible with Ubuntu's "dash" shell, tclsh
+    calls reduced further; initial device checking includes current
+    bConfigurationValue now, should work with config setting for multiple
+    devices; made tcl script conform to limitations of "jimsh", the minimal
+    tcl shell (hint from Barry Kauler); fixes for "usbserial" fallback
+    (driver binding for old systems); in the C program, changed parameter
+    "MessageDelay" (hitherto unused) to "ReleaseDelay", to be used in one
+    device configuration (delay interface release after bulk message sending)
+Version 1.1.5, 2010/11/28
+    Added special control message for Kobil devices (patch from Filip Aben);
+    try to get active configuration for interface class checking (there are
+    some new devices 'switching' via configuration selection);
+    fixed "0000" target product ID - again; new bash and tcl wrapper logic:
+    the convenience functions for driver binding and symlinking will now
+    start the tcl shell ONLY for known devices; changed and appended logging
+    capabilities of said convenience functions; add loading of "usbserial"
+    as a fallback for older systems to support new devices;
+    add workaround for bug in libusb1 which affects device search during
+    success check
+Version 1.1.4, 2010/08/17
+    The package should work at boot time now (cold and warm);
+    product IDs of "0000" do exist but were not accepted, fixed (thanks to
+    Sakis Dimopoulos); response endpoint is now always detected (led to
+    possible error report when resetting all endpoints in version 1.1.3);
+    wrapper script can now work with a packed collection of config files as
+    well as with the plain folder of files; use with the "install-packed"
+    make target of the data package (for use on systems with resource
+    constraints); wrapper fix for the symlink feature: handling of multiple
+    interrupt ports was incomplete; wrapper does not longer use a temporary
+    file for the symlink feature (security considerations, Marco d'Itri)
 Version 1.1.3, 2010/06/21
     Added delay option to separate multiple message transfers by millisecs;
     fixed (possibly dangerous) sloppy string handling (thanks to Christophe
@@ -13,7 +153,7 @@ Version 1.1.3, 2010/06/21
     in wrapper; changed ZTE skipping (if existing rules are found) to warning
 Version 1.1.2, 2010/04/18
     Added support for two additional bulk messages; wrapper handles special
-	ZTE case; generalized driver loading, new parameter "DriverModule" and
+    ZTE case; generalized driver loading, new parameter "DriverModule" and
     "DriverIDPath"; new wrapper facility to add symlink pointing to interrupt
     port (used in rule file from data pack >= 20100418)
 Version 1.1.1, 2010/03/17

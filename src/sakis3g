@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 MYVERSION="0.2.0e"
 
 # Transform debug to DEBUG, in order to declare debug method.
@@ -935,7 +935,7 @@ dialog_verbose() {
 			debug run_command "${touchbin} /tmp/sakis3g.zenity.pipe"
 			debug run_command "${chmodbin} 666 /tmp/sakis3g.zenity.pipe"
 			if [ -f "/tmp/sakis3g.zenity.pipe" ]; then
-				eval ${tailbin} -f "/tmp/sakis3g.zenity.pipe" "2> /dev/null" | ${zenitybin} --title="Sakis3G ${MYVERSION}" --text="`translate_text Working...`" --progress --percentage=0 --auto-close "> /dev/null 2> /dev/null" &
+				eval ${tailbin} -f "/tmp/sakis3g.zenity.pipe" "2> /dev/null" | ${zenitybin} --title="Sakis3G ${MYVERSION}" --text="`translate_text Working...`" --progress --percentage=0 --auto-close --auto-kill "> /dev/null 2> /dev/null" &
 				zenityverbosepid=$!
 				eval "disown -a" > /dev/null 2> /dev/null
 				export zenityverbosepid
@@ -1266,7 +1266,7 @@ we_are_root() {
 			# Nusty workaround because gksu does not properly handle arguments containing whitespaces
 			${touchbin} "/tmp/sakis3g.gksu.wrapper.$$"
 			${chmodbin} +x "/tmp/sakis3g.gksu.wrapper.$$"
-			${printfbin} "#!/bin/sh\nexport PROVIDER=\"%s\"\n%s %s %s\nexit \$?\n\n" "${PROVIDER}" "${ME}" "${allargs}" "${statevariables}" > "/tmp/sakis3g.gksu.wrapper.$$"
+			${printfbin} "#!/bin/bash\nexport PROVIDER=\"%s\"\n%s %s %s\nexit \$?\n\n" "${PROVIDER}" "${ME}" "${allargs}" "${statevariables}" > "/tmp/sakis3g.gksu.wrapper.$$"
 			[ ! -f "/tmp/sakis3g.gksu.wrapper.$$" ] && stop_fmt_error 3 "No method for acquiring root privileges found."
 			debug show_file "/tmp/sakis3g.gksu.wrapper.$$"
 			${gksubin} /tmp/sakis3g.gksu.wrapper.$$
@@ -6108,7 +6108,7 @@ compile_compilation_dependencies() {
 			show_fmt_error "Unable to delete \"%s\".\n" "/tmp/sakis3g.object.$$"
 			return 1
 		fi
-		debug run_command "${gccbin} -Wall -o \"/tmp/sakis3g.object.$$\" \"/tmp/sakis3g.source.$$.combined.c\""
+		debug run_command "${gccbin} -Wall -l usb-1.0 -o \"/tmp/sakis3g.object.$$\" \"/tmp/sakis3g.source.$$.combined.c\" -lusb-1.0 "
 		if [ ! -x "/tmp/sakis3g.object.$$" ]; then
 			if [ "a${header}" != "ausb.h" ]; then
 				show_fmt_error "Header file %s missing from your system.\n" "${header}"
@@ -6138,7 +6138,7 @@ compile_compilation_dependencies() {
 	echo "${accumulative}" | ${sedbin} -e "s/^\(.*\)$/#include <\1\>/g" > "/tmp/sakis3g.source.$$.combined.c"
 	${catbin} "/tmp/sakis3g.source.$$.h" "/tmp/sakis3g.source.$$.c" | ${grepbin} -v "^#include" >> "/tmp/sakis3g.source.$$.combined.c"
 	debug show_file "/tmp/sakis3g.source.$$.combined.c"
-	debug run_command "${gccbin} -Wall -lusb -o \"/tmp/sakis3g.object.$$\" \"/tmp/sakis3g.source.$$.combined.c\""
+	debug run_command "${gccbin} -Wall -l usb-1.0 -o \"/tmp/sakis3g.object.$$\" \"/tmp/sakis3g.source.$$.combined.c\" -lusb-1.0"
 	unset accumulative;
 	${rmbin} -f "/tmp/sakis3g.source.$$.combined.c" "/tmp/sakis3g.source.$$.c" "/tmp/sakis3g.source.$$.h" > /dev/null 2> /dev/null
 	if [ ! -x "/tmp/sakis3g.object.$$" ]; then

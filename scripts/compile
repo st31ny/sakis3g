@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 compressor="bzip2"
 decompressor="bunzip2"
@@ -64,7 +64,7 @@ fi
 
 if [ "a${mode}" = "afull" ]; then
 	rm -f "build/usb_modeswitch.compiled"
-	gcc -Wall -l usb -o build/usb_modeswitch.compiled dependencies/usb-modeswitch/usb_modeswitch.c -I dependencies/usb-modeswitch
+	gcc -Wall -l usb-1.0 -o build/usb_modeswitch.compiled dependencies/usb-modeswitch/usb_modeswitch.c -I dependencies/usb-modeswitch -lusb-1.0
 	[ ! -f "build/usb_modeswitch.compiled" ] && echo "Failed to compile usb-modeswitch." && exit 6
 	[ "`which strip 2> /dev/null`" ] && strip "build/usb_modeswitch.compiled"
 	rm -f "build/usb_modeswitch" ; mv "build/usb_modeswitch.compiled" "build/usb_modeswitch"
@@ -109,7 +109,7 @@ rm -f "build/.sakis3gz"
 
 packagesize=`stat --printf="%s\n" tmp/sakis3g.tar.${extension} 2>/dev/null`; packagesize=`echo ${packagesize}`
 
-echo "#!/bin/sh" > "build/.sakis3gz"
+echo "#!/bin/bash" > "build/.sakis3gz"
 grep "^MYVERSION" src/sakis3g >> "build/.sakis3gz"
 grep "^#" src/sakis3gz >> "build/.sakis3gz"
 echo "PACKAGE_SIZE=${packagesize}" >> "build/.sakis3gz"
