@@ -1,0 +1,18 @@
+Description: fix the path to libusb
+Author: Sophie Brun <sophie@freexian.com>
+Origin: vendor
+Forwarded: not-needed
+Last-Update: 2015-07-20
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/dependencies/usb-modeswitch/usb_modeswitch.h
++++ b/dependencies/usb-modeswitch/usb_modeswitch.h
+@@ -23,7 +23,7 @@
+ */
+ 
+ #include <stdlib.h>
+-#include <libusb.h>
++#include <libusb-1.0/libusb.h>
+ 
+ void readConfigFile(const char *configFilename);
+ void printConfig();
