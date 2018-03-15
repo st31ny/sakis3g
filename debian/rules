@@ -15,7 +15,6 @@
 override_dh_auto_build:
 	if [ ! -d "build" ]; then mkdir build; fi
 	./compile
-	cd man/ && gzip sakis3g.1 && gzip sakis3g.conf.5
 
 override_dh_auto_install:
 	dh_installdirs
